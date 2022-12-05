@@ -1,0 +1,24 @@
+version: "3.4"
+
+services:
+  php:
+    build:
+      target: app_php_dev
+    volumes:
+      - ./:/srv/app
+      - ./docker/php/conf.d/app.dev.ini:/usr/local/etc/php/conf.d/app.dev.ini:ro
+    environment:    
+      XDEBUG_MODE: "${XDEBUG_MODE:-off}"
+      APP_ENV: ${APP_DEV:-dev}
+      DATABASE_URL: postgresql://${DATABASE_USER:-galien_user}:${DATABASE_PASSWORD:-If1JSl73p9aT}@${DATABASE_IP:-postgres-database-1}:${DATABASE_PORT:-5432}/${DATABASE_NAME:-galien_local}?serverVersion=${POSTGRES_VERSION:-14}&charset=utf8
+    extra_hosts:      
+      - host.docker.internal:host-gateway
+
+  caddy:                  
+    volumes:   
+      - ./public:/srv/app/public:ro
+      - ./docker/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+
+networks:
+  symfony-docker_default:
+   external: true
